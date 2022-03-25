@@ -9,6 +9,7 @@ from xml.dom.minidom import parse, parseString
 from core.Util import *
 from controller.RouteController import *
 from controller.DijkstraController import DijkstraPolicy
+from controller.AStarController import AStarPolicy
 from core.target_vehicles_generation_protocols import *
 
 if 'SUMO_HOME' in os.environ:
@@ -54,6 +55,11 @@ def test_dijkstra_policy(vehicles):
     scheduler = DijkstraPolicy(init_connection_info)
     run_simulation(scheduler, vehicles)
 
+def test_astar_policy(vehicles):
+    print("Testing A* Search Algorithm Route Controller")
+    scheduler = AStarPolicy(init_connection_info)
+    run_simulation(scheduler, vehicles)
+
 
 def run_simulation(scheduler, vehicles):
 
@@ -68,9 +74,11 @@ def run_simulation(scheduler, vehicles):
         str(end_number)))
     print(str(deadlines_missed) + ' deadlines missed.')
 
+    traci.close()
+
 if __name__ == "__main__":
-    sumo_binary = checkBinary('sumo-gui')
-    # sumo_binary = checkBinary('sumo')#use this line if you do not want the UI of SUMO
+    #sumo_binary = checkBinary('sumo-gui')
+    sumo_binary = checkBinary('sumo')#use this line if you do not want the UI of SUMO
 
     # parse config file for map file name
     dom = parse("./configurations/myconfig.sumocfg")

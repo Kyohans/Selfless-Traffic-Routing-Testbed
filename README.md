@@ -1,66 +1,20 @@
-***Selfless Traffic Routing testbed based on SUMO (STR-SUMO)***
+# Selfless Traffic Routing Problem
 
-This project is built based on SUMO (https://sumo.dlr.de/docs/index.html#introduction), which offers a traffic simulation platform.
-The goal of STR-SUMO is to offer a testbed that can benchmark the performance of a routing policy under the following constraints:
-- Some vehicles are controlled by the scheudling algorithm;
-- Each controlled vehicle has three parameters: 1. start point (an edge), 2. destination (an edge), 3. time to set off, 4. deadline. When travelling from the start point to the destination from the time to set off, the time a vehicle reaches the destination should not exceed the deadline;
-The goal of the routing policy, i.e., the metrics used, includes:
-- How many vehicles have missed their deadlines -- the smaller the better;
-- What is the average time spent for all controlled vehicles -- the smaller the better.
+### Problem Description
 
-***pre-requisite***
+This problem defines a "real-time" traffic routing policy for a set of vehicles in a given map. We have to design an algorithm to this optimization problem such that each vehicle should be able to reach their destination within their corresponding deadlines as soon as possible.
 
-It is recommended to use Python 3.x, the packages required are included in requirements.txt. 
-You can use pip to install them directly (for Python 3.x):
-```
-pip3 install requirements.txt
-```
-You also need to install SUMO properly: https://sumo.dlr.de/docs/Installing/index.html
+### Algorithm Used
 
+I decided the use the A* Search Algorithm to solve this problem. The reason why I chose this algorithm is because it can reliably find the shortest path using several heuristic functions:
+- g: The distance between the successor and the current edge
+- h: Distance between the successor and the goal node
+- f: g + h
 
-***Layout of the repository***
+A* Search will choose which path to take based on the minima of `f`. A* Search is derived from Dijkstra's algorithm, but it is classified as a "smart" algorithm because of it's use of additional heuristics to solve graph traversal problems reliably.
 
-main.py: The entrance of the project. Can simply run it when all pre-requisites are installed using:
-```
-python3 main.py
-```
-It will show the benchmarking results of the Dijkstra routing policy for a set of vehicles sharing the same start point and the same destination.
+### How to use
 
-Next, we walk through each subdirectory.
-
-**configurations**
-
-Includes the mandatory configuration file: \*.sumocfg and \*.net.xml. Note that the \*.net.xml you specify in the sumocfg file must be placed directly in the configuration file repository.
-More maps are given in “maps" subdirectory.
-
-**core**
-
-Includes the core files of STR-SUMO. 
-- Util.py: includes the data structure used to store vehicle and map information;
-- network_map_data_structure.py: includes the useful operations to get infromation of the current map;
-- target_vehicles_generation_protocols.py: includes functions used to generate vehicles (including controlled vehicles' information and uncontrolled vehicles' routes)
-- STR-SUMO.py: takes in a routing policy and performs the simulation to benchmark the performance of the target policy under a given set of map and vehicle sets.
-
-**controller**
-
-Includes different scheduling policies.
-- RouteController.py: the base class of all routing policies;
-- DijkstraController.py: the routing plicy that employs Dijkstra to find the shortest path (without considering the congestion) for each controlled vehicles;
-- QLearningController.py: a simple routing policy using a trained agent. Specifically trained for map test.net.xml.
-
-**test**
-
-Includes the unit test for different core files.
-The test scripts should be placed in the main repository.
-
-***Contribution Guidance***
-
-**Codes**
-
-Please add comments for each function using the style pydoc can recognize: https://stackoverflow.com/questions/13040646/how-do-i-create-documentation-with-pydoc
-
-You are also recommended to add brief comments to state the function of each block of codes. Naming variables using convention lowercae_with_underscores is suggested.
-
-**Tests**
-
-For important functions, please write a simple test case naming as test_function_name.py. After the test is passed, archive it in the test directory. When reviewing codes, this would be helpful for code reviewers to understand the usage of functions and to expand the tests with some border cases.
+1. Install dependencies by running `pip install -r requirements.txt`
+2. Ensure SUMO is installed properly: https://sumo.dlr.de/docs/Installing/index.html
+3. Simply run `python main.py` to see the results
