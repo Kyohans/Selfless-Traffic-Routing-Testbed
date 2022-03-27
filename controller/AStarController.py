@@ -42,29 +42,56 @@ class AStarPolicy(RouteController):
             
             unvisited[current_edge] = current_distance
             path_list = {edge: [] for edge in self.connection_info.edge_list}
-            while unvisited or current_edge != vehicle.destination:
+            while True:
                 if current_edge not in self.connection_info.edge_length_dict.keys():
                     continue
 
-                n = None # edge with lowest f(n) found
-                for uv in unvisited.items():
-                    uv_length = self.connection_info.edge_length_dict[uv[0]]
-                    if n is None or g[uv[0]] + self.heuristic(uv_length, destination_distance) < g[n] + self.heuristic(self.connection_info.edge_length_dict[n], destination_distance):
-                        n = uv[0]
-
+                open_edges = []
+                min_direction, min_edge = None, None # edge with lowest f(n) found
                 for direction, outgoing_edge in self.connection_info.outgoing_edges_dict[current_edge].items():
                     edge_length = self.connection_info.edge_length_dict[outgoing_edge]
                     g[outgoing_edge] = g[starting_edge] + edge_length
+                    open_edges.append((direction, outgoing_edge))
 
-                    length_f = g[outgoing_edge] + self.heuristic(edge_length, destination_distance)
-                    if length_f < unvisited[outgoing_edge]:
-                        unvisited[outgoing_edge] = length_f
+                while open_edges:
+                    direction, outgoing_edge = open_edges.pop()
+                    edge_length = self.connection_info.edge_length_dict[outgoing_edge]
+                    if min_edge is None or g[outgoing_edge] + self.heuristic(edge_length, destination_distance) < g[min_edge] + self.heuristic(self.connection_info.edge_length_dict[min_edge], destination_distance):
+                        min_direction, min_edge = direction, outgoing_edge
+                        g[min_edge] = g[starting_edge] + self.connection_info.edge_length_dict[min_edge]
+                    
+                    if not min_edge or min_edge not in unvisited:
+                        continue
+
+                    length_f = g[min_edge] + self.heuristic(self.connection_info.edge_length_dict[min_edge], destination_distance)
+                    if length_f < unvisited[min_edge]:
+                        unvisited[min_edge] = length_f
                         current_path = deepcopy(path_list[current_edge])
-                        current_path.append(direction)
+                        current_path.append(min_direction)
                         path_list[outgoing_edge] = deepcopy(current_path)
+
+                #for direction, outgoing_edge in self.connection_info.outgoing_edges_dict[current_edge].items():
+                #    if outgoing_edge not in unvisited:
+                #        continue
+
+                #    edge_length = self.connection_info.edge_length_dict[outgoing_edge]
+                #    g[outgoing_edge] = g[starting_edge] + edge_length
+
+                #    if min_edge is None or g[outgoing_edge] + self.heuristic(edge_length, destination_distance) < g[min_edge] + self.heuristic(self.connection_info.edge_length_dict[min_edge], destination_distance):
+                #        min_direction, min_edge = direction, outgoing_edge
+
+                #    length_f = g[min_edge] + self.heuristic(edge_length, destination_distance)
+                #    if length_f < unvisited[min_edge]:
+                #        unvisited[min_edge] = length_f
+                #        current_path = deepcopy(path_list[current_edge])
+                #        current_path.append(min_direction)
+                #        path_list[outgoing_edge] = deepcopy(current_path)
             
-                    visited[current_edge] = current_distance
-                    del unvisited[current_edge]
+                visited[current_edge] = current_distance
+                del unvisited[current_edge]
+
+                if not unvisited or current_edge == vehicle.destination:
+                    break
 
                 possible_edges = [edge for edge in unvisited.items() if edge[1]]
                 current_edge, current_distance = sorted(possible_edges, key = lambda x: x[1])[0]

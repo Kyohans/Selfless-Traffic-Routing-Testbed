@@ -11,6 +11,7 @@ from controller.RouteController import *
 from controller.DijkstraController import DijkstraPolicy
 from controller.AStarController import AStarPolicy
 from core.target_vehicles_generation_protocols import *
+import time
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -82,6 +83,7 @@ if __name__ == "__main__":
 
     # parse config file for map file name
     dom = parse("./configurations/myconfig.sumocfg")
+    #dom = parse("./configurations/customconfig.sumocfg")
 
     net_file_node = dom.getElementsByTagName('net-file')
     net_file_attr = net_file_node[0].attributes
@@ -98,3 +100,6 @@ if __name__ == "__main__":
         print("id: {}, destination: {}, start time:{}, deadline: {};".format(vid, \
             v.destination, v.start_time, v.deadline))
     test_dijkstra_policy(vehicles)
+    print("\n\n\n")
+    time.sleep(1)
+    test_astar_policy(vehicles)
