@@ -13,6 +13,7 @@ else:
 
 import traci
 import sumolib
+import pandas as pd
 from controller.RouteController import *
 
 """
@@ -52,6 +53,12 @@ class StrSumo:
         total_time = 0
         end_number = 0
         deadlines_missed = []
+        results = {
+            "Vehicle ID": [],
+            "Reached Destination": [],
+            "Timespan": [],
+            "Deadline Missed": [],
+        }
 
         step = 0
         vehicles_to_direct = [] #  the batch of controlled vehicles passed to make_decisions()
@@ -123,6 +130,11 @@ class StrSumo:
                         end_number += 1
                         print("Vehicle {} reaches the destination: {}, timespan: {}, deadline missed: {}"\
                             .format(vehicle_id, arrived_at_destination, time_span, miss))
+                        
+                        results["Vehicle ID"].append(vehicle_id)
+                        results["Reached Destination"].append(arrived_at_destination)
+                        results["Timespan"].append(time_span)
+                        results["Deadline Missed"].append(miss)
                         #if not arrived_at_destination:
                             #print("{} - {}".format(self.controlled_vehicles[vehicle_id].local_destination, self.controlled_vehicles[vehicle_id].destination))
 
@@ -138,6 +150,9 @@ class StrSumo:
             print(err)
 
         num_deadlines_missed = len(deadlines_missed)
+        
+        dataframe = pd.DataFrame(results)
+        dataframe.to_csv("results.csv")
 
         return total_time, end_number, num_deadlines_missed
 
