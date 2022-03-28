@@ -33,7 +33,7 @@ class AStarPolicy(RouteController):
             visited = {}
             
             starting_edge = vehicle.current_edge
-            g = defaultdict(int) # Distance from starting edge
+            g = {} # Distance from start node
             g[starting_edge] = 0
 
             current_edge = vehicle.current_edge
@@ -46,7 +46,7 @@ class AStarPolicy(RouteController):
                 if current_edge not in self.connection_info.edge_length_dict.keys():
                     continue
 
-                open_edges = []
+                open_edges = [] # List holding outgoing edges that need to be evaluated
                 min_direction, min_edge = None, None # edge with lowest f(n) found
                 for direction, outgoing_edge in self.connection_info.outgoing_edges_dict[current_edge].items():
                     edge_length = self.connection_info.edge_length_dict[outgoing_edge]
@@ -69,23 +69,6 @@ class AStarPolicy(RouteController):
                         current_path = deepcopy(path_list[current_edge])
                         current_path.append(min_direction)
                         path_list[outgoing_edge] = deepcopy(current_path)
-
-                #for direction, outgoing_edge in self.connection_info.outgoing_edges_dict[current_edge].items():
-                #    if outgoing_edge not in unvisited:
-                #        continue
-
-                #    edge_length = self.connection_info.edge_length_dict[outgoing_edge]
-                #    g[outgoing_edge] = g[starting_edge] + edge_length
-
-                #    if min_edge is None or g[outgoing_edge] + self.heuristic(edge_length, destination_distance) < g[min_edge] + self.heuristic(self.connection_info.edge_length_dict[min_edge], destination_distance):
-                #        min_direction, min_edge = direction, outgoing_edge
-
-                #    length_f = g[min_edge] + self.heuristic(edge_length, destination_distance)
-                #    if length_f < unvisited[min_edge]:
-                #        unvisited[min_edge] = length_f
-                #        current_path = deepcopy(path_list[current_edge])
-                #        current_path.append(min_direction)
-                #        path_list[outgoing_edge] = deepcopy(current_path)
             
                 visited[current_edge] = current_distance
                 del unvisited[current_edge]

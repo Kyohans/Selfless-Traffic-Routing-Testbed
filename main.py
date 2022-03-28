@@ -61,7 +61,6 @@ def test_astar_policy(vehicles):
     scheduler = AStarPolicy(init_connection_info)
     run_simulation(scheduler, vehicles)
 
-
 def run_simulation(scheduler, vehicles):
 
     simulation = StrSumo(scheduler, init_connection_info, vehicles)
@@ -69,6 +68,12 @@ def run_simulation(scheduler, vehicles):
     traci.start([sumo_binary, "-c", "./configurations/myconfig.sumocfg", \
                  "--tripinfo-output", "./configurations/trips.trips.xml", \
                  "--fcd-output", "./configurations/testTrace.xml"])
+
+    """
+    traci.start([sumo_binary, "-c", "./configurations/customconfig.sumocfg", \
+                 "--tripinfo-output", "./configurations/trips.trips.xml", \
+                 "--fcd-output", "./configurations/testTrace.xml"])
+    """
 
     total_time, end_number, deadlines_missed = simulation.run()
     print("Average timespan: {}, total vehicle number: {}".format(str(total_time/end_number),\
@@ -94,12 +99,11 @@ if __name__ == "__main__":
     route_file_node = dom.getElementsByTagName('route-files')
     route_file_attr = route_file_node[0].attributes
     route_file = "./configurations/"+route_file_attr['value'].nodeValue
-    vehicles = get_controlled_vehicles(route_file, init_connection_info, 10, 50)
+    vehicles = get_controlled_vehicles(route_file, init_connection_info, 50, 50)
     #print the controlled vehicles generated
     for vid, v in vehicles.items():
         print("id: {}, destination: {}, start time:{}, deadline: {};".format(vid, \
             v.destination, v.start_time, v.deadline))
-    test_dijkstra_policy(vehicles)
-    print("\n\n\n")
-    time.sleep(1)
+    # uncomment either line to use dijkstra or a*
+    #test_dijkstra_policy(vehicles)
     test_astar_policy(vehicles)
